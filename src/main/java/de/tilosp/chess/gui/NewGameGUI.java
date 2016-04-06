@@ -1,5 +1,7 @@
 package de.tilosp.chess.gui;
 
+import de.tilosp.chess.player.LocalPlayer;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -73,6 +75,7 @@ public class NewGameGUI extends GUI {
         c.gridx = 0;
         c.gridwidth = 5;
         panel.add(startButton = new JButton("Start"), c);
+        getRootPane().setDefaultButton(startButton);
 
         updateEnabledStatus();
 
@@ -120,7 +123,18 @@ public class NewGameGUI extends GUI {
     }
 
     private void onStartButtonPressed() {
-        // TODO
+        if (onePlayerRadioButton.isSelected()) {
+            // TODO 1 Player
+        } else {
+            if (twoPlayerModeComboBox.getSelectedIndex() == 0) {
+                // 2 Players local
+                new ChessboardGUI(new LocalPlayer(), new LocalPlayer()).setVisible(true);
+            } else if(twoPlayerModeComboBox.getSelectedIndex() == 1) {
+                // TODO 2 Players host
+            } else {
+                // TODO 2 Players client
+            }
+        }
         dispose();
     }
 
