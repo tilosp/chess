@@ -101,7 +101,7 @@ public class ChessboardGUI extends GUI {
 
 
         sidePanel.add(Box.createVerticalGlue(), BorderLayout.CENTER);
-        topLabel = new JLabel("White");
+        topLabel = new JLabel();
         topLabel.setFont(FONT_LABEL);
         topLabel.setBorder(BORDER_INSERTS);
 
@@ -248,5 +248,6 @@ public class ChessboardGUI extends GUI {
         // update promotion buttons
         for (int i = 0; i < 4; i++)
             promotionButtons[i].setEnabled(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer);
+        topLabel.setText(chessboard.playerColor.toString().toLowerCase());
     }
 }
