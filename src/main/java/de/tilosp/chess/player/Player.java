@@ -1,4 +1,4 @@
 package de.tilosp.chess.player;
 
-abstract class Player {
+public abstract class Player {
 }
