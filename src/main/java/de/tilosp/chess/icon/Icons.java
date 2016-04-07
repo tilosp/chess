@@ -7,16 +7,16 @@ import javax.swing.*;
 
 public final class Icons {
 
-    private static final Icon[][] icons;
+    private static final ImageIcon[][] icons;
 
     static {
-        icons = new Icon[PlayerColor.values().length][ChessPieceType.values().length];
+        icons = new ImageIcon[PlayerColor.values().length][ChessPieceType.values().length];
         for (PlayerColor playerColor : PlayerColor.values())
             for (ChessPieceType chessPieceType : ChessPieceType.values())
                 icons[playerColor.ordinal()][chessPieceType.ordinal()] = new ImageIcon(Icons.class.getResource(playerColor.name().toLowerCase() + "_" + chessPieceType.name().toLowerCase() + ".png"));
     }
 
-    public static Icon getIcon(PlayerColor playerColor, ChessPieceType chessPieceType) {
+    public static ImageIcon getIcon(PlayerColor playerColor, ChessPieceType chessPieceType) {
         return icons[playerColor.ordinal()][chessPieceType.ordinal()];
     }
 }
