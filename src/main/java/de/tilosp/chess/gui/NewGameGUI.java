@@ -1,5 +1,6 @@
 package de.tilosp.chess.gui;
 
+import de.tilosp.chess.localisation.Localisation;
 import de.tilosp.chess.player.LocalPlayer;
 
 import javax.swing.*;
@@ -23,7 +24,7 @@ public class NewGameGUI extends GUI {
 
     @Override
     void initGUI() {
-        setTitle("New Game");
+        setTitle(Localisation.getString("new_game.title"));
         panel.setLayout(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         GridBagConstraints c = new GridBagConstraints();
@@ -36,7 +37,7 @@ public class NewGameGUI extends GUI {
         c.gridy = 0;
         c.gridx = 0;
         c.gridwidth = 2;
-        panel.add(onePlayerRadioButton = new JRadioButton("1 Player"), c);
+        panel.add(onePlayerRadioButton = new JRadioButton(Localisation.getString("new_game.one_player")), c);
         buttonGroup.add(onePlayerRadioButton);
         onePlayerRadioButton.setSelected(true);
         c.gridx = 2;
@@ -45,18 +46,18 @@ public class NewGameGUI extends GUI {
         panel.add(Box.createHorizontalStrut(10), c);
         c.gridheight = 1;
         c.gridx = 3;
-        panel.add(colorLabel = new JLabel("Color"), c);
+        panel.add(colorLabel = new JLabel(Localisation.getString("new_game.color")), c);
         c.gridx = 4;
-        panel.add(colorComboBox = new JComboBox<>(new String[] { "white", "black" }), c);
+        panel.add(colorComboBox = new JComboBox<>(new String[] { Localisation.getString("player_color.white"), Localisation.getString("player_color.black") }), c);
 
         c.gridy = 1;
         c.gridx = 0;
         c.gridwidth = 2;
-        panel.add(twoPlayerRadioButton = new JRadioButton("2 Player"), c);
+        panel.add(twoPlayerRadioButton = new JRadioButton(Localisation.getString("new_game.two_players")), c);
         buttonGroup.add(twoPlayerRadioButton);
         c.gridx = 3;
         c.gridwidth = 1;
-        panel.add(hostLabel = new JLabel("Host"), c);
+        panel.add(hostLabel = new JLabel(Localisation.getString("new_game.host")), c);
         c.gridx = 4;
         panel.add(hostTextField = new JTextField("localhost"), c);
         hostTextField.setPreferredSize(new Dimension(150, -1));
@@ -65,16 +66,16 @@ public class NewGameGUI extends GUI {
         c.gridx = 0;
         panel.add(Box.createHorizontalStrut(18), c);
         c.gridx = 1;
-        panel.add(twoPlayerModeComboBox = new JComboBox<>(new String[] { "local", "server", "client" }), c);
+        panel.add(twoPlayerModeComboBox = new JComboBox<>(new String[] { Localisation.getString("new_game.local"), Localisation.getString("new_game.server"), Localisation.getString("new_game.client") }), c);
         c.gridx = 3;
-        panel.add(portLabel = new JLabel("Port"), c);
+        panel.add(portLabel = new JLabel(Localisation.getString("new_game.port")), c);
         c.gridx = 4;
         panel.add(portTextField = new JTextField("49152"), c);
 
         c.gridy = 3;
         c.gridx = 0;
         c.gridwidth = 5;
-        panel.add(startButton = new JButton("Start"), c);
+        panel.add(startButton = new JButton(Localisation.getString("new_game.start")), c);
         getRootPane().setDefaultButton(startButton);
 
         updateEnabledStatus();
