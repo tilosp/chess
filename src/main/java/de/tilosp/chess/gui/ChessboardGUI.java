@@ -4,6 +4,7 @@ import de.tilosp.chess.icon.Icons;
 import de.tilosp.chess.lib.ChessPiece;
 import de.tilosp.chess.lib.ChessPieceType;
 import de.tilosp.chess.lib.Chessboard;
+import de.tilosp.chess.localisation.Localisation;
 import de.tilosp.chess.player.LocalPlayer;
 import de.tilosp.chess.player.Player;
 
@@ -35,6 +36,7 @@ public class ChessboardGUI extends GUI {
     private static final Color COLOR_PROMOTION_D = Color.WHITE.darker();
 
     private static final Font FONT_LABEL = new Font(null, 0, 75);
+    private static final Font FONT_LABEL_TOP = new Font(null, Font.BOLD, 45);
 
     private HoverButton[][] boardButtons;
     private HoverButton[] promotionButtons;
@@ -53,7 +55,7 @@ public class ChessboardGUI extends GUI {
 
     @Override
     void initGUI() {
-        setTitle("Chess");
+        setTitle(Localisation.getString("chessboard.title"));
         panel.setLayout(new BorderLayout());
         JPanel chessboardMPanel = new JPanel();
         panel.add(chessboardMPanel, BorderLayout.CENTER);
@@ -102,8 +104,9 @@ public class ChessboardGUI extends GUI {
 
         sidePanel.add(Box.createVerticalGlue(), BorderLayout.CENTER);
         topLabel = new JLabel();
-        topLabel.setFont(FONT_LABEL);
+        topLabel.setFont(FONT_LABEL_TOP);
         topLabel.setBorder(BORDER_INSERTS);
+        topLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         sidePanel.add(topLabel, BorderLayout.PAGE_START);
 
@@ -248,6 +251,6 @@ public class ChessboardGUI extends GUI {
         // update promotion buttons
         for (int i = 0; i < 4; i++)
             promotionButtons[i].setEnabled(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer);
-        topLabel.setText(chessboard.playerColor.toString().toLowerCase());
+        topLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
     }
 }
