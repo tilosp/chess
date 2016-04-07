@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public final class Icons {
 
-    public static final Icon[][] icons;
+    private static final Icon[][] icons;
 
     static {
         icons = new Icon[PlayerColor.values().length][ChessPieceType.values().length];
