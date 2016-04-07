@@ -4,6 +4,7 @@ import de.tilosp.chess.icon.Icons;
 import de.tilosp.chess.lib.ChessPiece;
 import de.tilosp.chess.lib.ChessPieceType;
 import de.tilosp.chess.lib.Chessboard;
+import de.tilosp.chess.localisation.Localisation;
 import de.tilosp.chess.player.LocalPlayer;
 import de.tilosp.chess.player.Player;
 
@@ -23,24 +24,16 @@ public class ChessboardGUI extends GUI {
     private static final Border BORDER_BEVEL_LOWERED = BorderFactory.createBevelBorder(BevelBorder.LOWERED);
     private static final Border BORDER_SIDE_PANEL = BorderFactory.createCompoundBorder(BORDER_BEVEL_RAISED, BORDER_BEVEL_LOWERED);
 
-    private static final Color COLOR_1 = new Color(255, 206, 158);
-    private static final Color COLOR_1_B = new Color(255, 222, 174);
-    private static final Color COLOR_2 = new Color(209, 139, 71);
-    private static final Color COLOR_2_B = new Color(225, 155, 87);
-    private static final Color COLOR_SELECTED = new Color(209, 82, 60);
-    private static final Color COLOR_SELECTED_B = new Color(225, 98, 76);
-    private static final Color COLOR_SHOW = new Color(183, 78, 55);
-    private static final Color COLOR_SHOW_B = new Color(199, 94, 71);
-    private static final Color COLOR_PROMOTION = Color.WHITE;
-    private static final Color COLOR_PROMOTION_D = Color.WHITE.darker();
-
     private static final Font FONT_LABEL = new Font(null, 0, 75);
+    private static final Font FONT_LABEL_TOP = new Font(null, Font.BOLD, 45);
 
-    private HoverButton[][] boardButtons;
-    private HoverButton[] promotionButtons;
+    private ChessboardButton[][] boardButtons;
+    private JButton[] promotionButtons;
     private JLabel[] topLabels;
     private JLabel[] leftLabels;
     private JLabel topLabel;
+    private JPanel chessboardPanel;
+    private JPanel promotionPanel;
 
     private final Player[] players;
     private Chessboard chessboard;
@@ -53,7 +46,7 @@ public class ChessboardGUI extends GUI {
 
     @Override
     void initGUI() {
-        setTitle("Chess");
+        setTitle(Localisation.getString("chessboard.title"));
         panel.setLayout(new BorderLayout());
         JPanel chessboardMPanel = new JPanel();
         panel.add(chessboardMPanel, BorderLayout.CENTER);
@@ -61,7 +54,7 @@ public class ChessboardGUI extends GUI {
         chessboard = new Chessboard();
 
         // initialise chessboard
-        JPanel chessboardPanel = new JPanel(new GridLayout(9, 9));
+        chessboardPanel = new JPanel(new GridLayout(9, 9));
         chessboardMPanel.add(chessboardPanel);
         chessboardMPanel.addComponentListener(new ComponentAdapter() {
 
@@ -73,8 +66,8 @@ public class ChessboardGUI extends GUI {
             }
         });
 
-        boardButtons = new HoverButton[8][8];
-        promotionButtons = new HoverButton[4];
+        boardButtons = new ChessboardButton[8][8];
+        promotionButtons = new JButton[4];
         topLabels = new JLabel[8];
         leftLabels = new JLabel[8];
 
@@ -83,11 +76,8 @@ public class ChessboardGUI extends GUI {
             chessboardPanel.add(topLabels[i] = newLabel(Character.toString((char) (0x61 + i))));
         for (int y = 0; y < 8; y++) {
             chessboardPanel.add(leftLabels[y] = newLabel(Integer.toString(8 - y)));
-            for (int x = 0; x < 8; x++) {
-                HoverButton button = new HoverButton();
-                button.setBorder(null);
-                chessboardPanel.add(boardButtons[x][y] = button);
-            }
+            for (int x = 0; x < 8; x++)
+                chessboardPanel.add(boardButtons[x][y] = new ChessboardButton(((x ^ y) & 1) == 0));
         }
 
         // initialise side panel
@@ -102,19 +92,20 @@ public class ChessboardGUI extends GUI {
 
         sidePanel.add(Box.createVerticalGlue(), BorderLayout.CENTER);
         topLabel = new JLabel();
-        topLabel.setFont(FONT_LABEL);
+        topLabel.setFont(FONT_LABEL_TOP);
         topLabel.setBorder(BORDER_INSERTS);
+        topLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         sidePanel.add(topLabel, BorderLayout.PAGE_START);
 
         // add promotion buttons
-        JPanel promotionPanel = new JPanel(new GridLayout(2, 2));
+        promotionPanel = new JPanel(new GridLayout(2, 2));
         promotionPanel.setBorder(BORDER_INSERTS);
         for (int i = 0; i < 4; i++) {
-            HoverButton button = new HoverButton();
+            JButton button = new JButton();
+            button.setPreferredSize(new Dimension(100, 100));
+            button.setContentAreaFilled(false);
             button.setBorder(null);
-            button.setBackground(COLOR_PROMOTION, COLOR_PROMOTION_D);
-            button.setEnabled(false);
             promotionPanel.add(promotionButtons[i] = button);
         }
         sidePanel.add(promotionPanel, BorderLayout.PAGE_END);
@@ -203,18 +194,20 @@ public class ChessboardGUI extends GUI {
         if (chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer) {
             chessboard = chessboard.promotion(ChessPieceType.POSITIONS_PROMOTION[i]);
             updateIcons();
+            chessboardPanel.repaint();
         }
     }
 
     private void updateBackground() {
         for (int y = 0; y < 8; y++)
             for (int x = 0; x < 8; x++)
-                boardButtons[x][y].setBackground(((x ^ y) & 1) == 0 ? COLOR_1 : COLOR_2, ((x ^ y) & 1) == 0 ? COLOR_1_B : COLOR_2_B);
+                boardButtons[x][y].iconReset();
         if (selected != null) {
-            boardButtons[selected[0]][selected[1]].setBackground(COLOR_SELECTED, COLOR_SELECTED_B);
+            boardButtons[selected[0]][selected[1]].iconSelected();
             for (int[] m : chessboard.getPossibleMoves(selected[0], selected[1]))
-                boardButtons[m[0]][m[1]].setBackground(COLOR_SHOW, COLOR_SHOW_B);
+                boardButtons[m[0]][m[1]].iconShow();
         }
+        chessboardPanel.repaint();
     }
 
     private JLabel newLabel(String text) {
@@ -243,11 +236,8 @@ public class ChessboardGUI extends GUI {
 
         // update promotion icons
         for (int i = 0; i < 4; i++)
-            promotionButtons[i].setIcon(Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]));
+            promotionButtons[i].setIcon(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer ? Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]) : null);
 
-        // update promotion buttons
-        for (int i = 0; i < 4; i++)
-            promotionButtons[i].setEnabled(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer);
-        topLabel.setText(chessboard.playerColor.toString().toLowerCase());
+        topLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
     }
 }
