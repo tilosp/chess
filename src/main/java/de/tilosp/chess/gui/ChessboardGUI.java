@@ -12,10 +12,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 public class ChessboardGUI extends GUI {
 
@@ -35,6 +32,8 @@ public class ChessboardGUI extends GUI {
     private JPanel chessboardPanel;
     private JPanel promotionPanel;
 
+    private JMenuItem newMenuItem;
+
     private final Player[] players;
     private Chessboard chessboard;
     private int[] selected;
@@ -50,6 +49,13 @@ public class ChessboardGUI extends GUI {
         panel.setLayout(new BorderLayout());
         JPanel chessboardMPanel = new JPanel();
         panel.add(chessboardMPanel, BorderLayout.CENTER);
+
+        // initialise menu bar
+        JMenuBar menu = new JMenuBar();
+        setJMenuBar(menu);
+        JMenu gameMenu = new JMenu(Localisation.getString("chessboard.menu_bar.game"));
+        menu.add(gameMenu);
+        gameMenu.add(newMenuItem = new JMenuItem(Localisation.getString("chessboard.menu_bar.game.new")));
 
         chessboard = new Chessboard();
 
@@ -121,6 +127,12 @@ public class ChessboardGUI extends GUI {
 
     @Override
     void initListeners() {
+        // menu bar listeners
+        newMenuItem.addActionListener(e -> {
+            // Open NewGameGUI Window
+            new NewGameGUI().setVisible(true);
+        });
+        // chessboard listeners
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 final int fX = x, fY = y;
