@@ -33,6 +33,7 @@ public class ChessboardGUI extends GUI {
     private JPanel promotionPanel;
 
     private JMenuItem newMenuItem;
+    private JCheckBoxMenuItem cheatCheckBoxMenuItem;
 
     private final Player[] players;
     private Chessboard chessboard;
@@ -41,6 +42,7 @@ public class ChessboardGUI extends GUI {
     public ChessboardGUI(Player player1, Player player2) {
         super();
         players = new Player[] { player1, player2 };
+        cheatCheckBoxMenuItem.setEnabled(players[0] instanceof LocalPlayer && players[1] instanceof LocalPlayer);
     }
 
     @Override
@@ -56,6 +58,8 @@ public class ChessboardGUI extends GUI {
         JMenu gameMenu = new JMenu(Localisation.getString("chessboard.menu_bar.game"));
         menu.add(gameMenu);
         gameMenu.add(newMenuItem = new JMenuItem(Localisation.getString("chessboard.menu_bar.game.new")));
+        gameMenu.addSeparator();
+        gameMenu.add(cheatCheckBoxMenuItem = new JCheckBoxMenuItem(Localisation.getString("chessboard.menu_bar.game.cheat_mode")));
 
         chessboard = new Chessboard();
 
@@ -140,7 +144,19 @@ public class ChessboardGUI extends GUI {
                 boardButtons[x][y].addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-
+                        if (cheatCheckBoxMenuItem.isSelected()) {
+                            if (e.getButton() == MouseEvent.BUTTON2) { // middle click
+                                chessboard = chessboard.cycleColor(fX, fY);
+                                selected = null;
+                                updateIcons();
+                                updateBackground();
+                            } else if (e.getButton() == MouseEvent.BUTTON3) { // right click
+                                chessboard = chessboard.cycleChessPieceType(fX, fY);
+                                selected = null;
+                                updateIcons();
+                                updateBackground();
+                            }
+                        }
                     }
 
                     @Override

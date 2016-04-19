@@ -183,4 +183,27 @@ public class Chessboard {
             a[i] = Arrays.copyOf(array[i], array[i].length);
         return a;
     }
+
+    public Chessboard cycleColor(int x, int y) {
+        ChessPiece[][] chessPieces = copy(this.chessPieces);
+        if (chessPieces[x][y] != null) {
+            chessPieces[x][y] = new ChessPiece(chessPieces[x][y].chessPieceType, chessPieces[x][y].playerColor.otherColor());
+        } else {
+            chessPieces[x][y] = new ChessPiece(ChessPieceType.PAWN, PlayerColor.BLACK);
+        }
+        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY);
+    }
+
+    public Chessboard cycleChessPieceType(int x, int y) {
+        ChessPiece[][] chessPieces = copy(this.chessPieces);
+        if (chessPieces[x][y] != null) {
+            if (chessPieces[x][y].chessPieceType == ChessPieceType.KING)
+                chessPieces[x][y] = null;
+            else
+                chessPieces[x][y] = new ChessPiece(ChessPieceType.values()[(chessPieces[x][y].chessPieceType.ordinal()- 1)], chessPieces[x][y].playerColor);
+        } else {
+            chessPieces[x][y] = new ChessPiece(ChessPieceType.PAWN, PlayerColor.WHITE);
+        }
+        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY);
+    }
 }
