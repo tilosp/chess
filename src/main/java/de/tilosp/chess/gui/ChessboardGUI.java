@@ -4,6 +4,7 @@ import de.tilosp.chess.icon.Icons;
 import de.tilosp.chess.lib.ChessPiece;
 import de.tilosp.chess.lib.ChessPieceType;
 import de.tilosp.chess.lib.Chessboard;
+import de.tilosp.chess.lib.PlayerColor;
 import de.tilosp.chess.localisation.Localisation;
 import de.tilosp.chess.player.LocalPlayer;
 import de.tilosp.chess.player.Player;
@@ -213,6 +214,8 @@ public class ChessboardGUI extends GUI {
                     selected = null;
                     updateIcons();
                     updateBackground();
+                    if (!chessboard.promotion)
+                        updateGameState();
                 }
             }
         }
@@ -223,6 +226,7 @@ public class ChessboardGUI extends GUI {
             chessboard = chessboard.promotion(ChessPieceType.POSITIONS_PROMOTION[i]);
             updateIcons();
             chessboardPanel.repaint();
+            updateGameState();
         }
     }
 
@@ -267,5 +271,15 @@ public class ChessboardGUI extends GUI {
             promotionButtons[i].setIcon(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer ? Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]) : null);
 
         topLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
+    }
+
+    private void updateGameState() {
+        if (chessboard.isDraw()) {
+            JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.draw"), Localisation.getString("chessboard.message.draw"), JOptionPane.PLAIN_MESSAGE);
+        } else if (chessboard.isWin(PlayerColor.WHITE)) {
+            JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.white_won"), Localisation.getString("chessboard.message.white_won"), JOptionPane.PLAIN_MESSAGE);
+        } else if (chessboard.isWin(PlayerColor.BLACK)) {
+            JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.black_won"), Localisation.getString("chessboard.message.black_won"), JOptionPane.PLAIN_MESSAGE);
+        }
     }
 }

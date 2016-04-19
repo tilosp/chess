@@ -206,4 +206,20 @@ public class Chessboard {
         }
         return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY);
     }
+
+    private boolean canMove() {
+        for (int i1 = 0; i1 < 8; i1++)
+            for (int i2 = 0; i2 < 8; i2++)
+                if (chessPieces[i1][i2] != null && chessPieces[i1][i2].playerColor == playerColor && !getPossibleMoves(i1, i2).isEmpty())
+                    return true;
+        return false;
+    }
+
+    public boolean isDraw() {
+        return !canMove() && !inCheck(playerColor);
+    }
+
+    public boolean isWin(PlayerColor color) {
+        return color != playerColor && !canMove() && inCheck(playerColor);
+    }
 }
