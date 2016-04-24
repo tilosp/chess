@@ -1,7 +1,7 @@
 package de.tilosp.chess.lib;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Chessboard {
@@ -23,6 +23,7 @@ public class Chessboard {
     public final boolean promotion;
     private final int promotionX;
     private final int promotionY;
+    final boolean endGame;
 
 
     public Chessboard() {
@@ -36,6 +37,10 @@ public class Chessboard {
         this.promotion = promotion;
         this.promotionX = promotionX;
         this.promotionY = promotionY;
+        this.endGame = (countChessPieces(PlayerColor.WHITE, ChessPieceType.QUEEN) == 0 ||
+                (countChessPieces(PlayerColor.WHITE, ChessPieceType.ROOK) == 0 && countChessPieces(PlayerColor.WHITE, ChessPieceType.BISHOP, ChessPieceType.KNIGHT) <= 1))
+                && (countChessPieces(PlayerColor.BLACK, ChessPieceType.QUEEN) == 0 ||
+                (countChessPieces(PlayerColor.BLACK, ChessPieceType.ROOK) == 0 && countChessPieces(PlayerColor.BLACK, ChessPieceType.BISHOP, ChessPieceType.KNIGHT) <= 1));
     }
 
     public ArrayList<int[]> getPossibleMoves(int x, int y) {
@@ -45,9 +50,9 @@ public class Chessboard {
             for (int[] a : chessPiece.getCapture()) {
                 if (a.length == 4) { // en passant
                     int gX = x + a[0];
-                    int gY = y + a[1] * (chessPiece.playerColor.ordinal() * 2 - 1);
+                    int gY = y - a[1] * chessPiece.playerColor.sign;
                     int bX = x + a[2];
-                    int bY = y + a[3] * (chessPiece.playerColor.ordinal() * 2 - 1);
+                    int bY = y - a[3] * chessPiece.playerColor.sign;
                     if (gX < 0 || gX > 7 || gY < 0 || gY > 7)
                         continue;
                     if (chessPieces[gX][gY] == null && chessPieces[bX][bY] != null && chessPieces[bX][bY].playerColor != chessPiece.playerColor && chessPieces[bX][bY].chessPieceType == ChessPieceType.PAWN && chessPieces[bX][bY].checkEnPassant(turn))
@@ -56,7 +61,7 @@ public class Chessboard {
                     int extend = a.length == 3 ? a[2] : 1;
                     for (int i = 1; i <= extend; i++) {
                         int nX = x + i * a[0];
-                        int nY = y + i * a[1] * (chessPiece.playerColor.ordinal() * 2 - 1);
+                        int nY = y - i * a[1] * chessPiece.playerColor.sign;
                         if (nX < 0 || nX > 7 || nY < 0 || nY > 7)
                             continue;
                         if (chessPieces[nX][nY] != null) {
@@ -71,7 +76,7 @@ public class Chessboard {
                 int extend = a.length == 3 ? a[2] : 1;
                 for (int i = 1; i <= extend; i++) {
                     int nX = x + i * a[0];
-                    int nY = y + i * a[1] * (chessPiece.playerColor.ordinal() * 2 - 1);
+                    int nY = y - i * a[1] * chessPiece.playerColor.sign;
                     if (nX < 0 || nX > 7 || nY < 0 || nY > 7)
                         continue;
                     if (chessPieces[nX][nY] == null)
@@ -93,7 +98,7 @@ public class Chessboard {
         return possibilities;
     }
 
-    private ArrayList<int[]> getThreatenedFields(int x, int y) {
+    ArrayList<int[]> getThreatenedFields(int x, int y) {
         ArrayList<int[]> possibilities = new ArrayList<>();
         ChessPiece chessPiece = chessPieces[x][y];
         if (chessPiece != null) {
@@ -101,7 +106,7 @@ public class Chessboard {
                 int extend = a.length == 3 ? a[2] : 1;
                 for (int i = 1; i <= extend; i++) {
                     int nX = x + i * a[0];
-                    int nY = y + i * a[1] * (chessPiece.playerColor.ordinal() * 2 - 1);
+                    int nY = y - i * a[1] * chessPiece.playerColor.sign;
                     if (nX < 0 || nX > 7 || nY < 0 || nY > 7)
                         continue;
                     if (chessPieces[nX][nY] == null) {
@@ -126,7 +131,7 @@ public class Chessboard {
         return false;
     }
 
-    private Chessboard move(int[] from, int[] to) {
+    Chessboard move(int[] from, int[] to) {
         ChessPiece[][] chessPieces = copy(this.chessPieces);
         chessPieces[to[0]][to[1]] = this.chessPieces[from[0]][from[1]].moved(turn, Math.abs(from[1] - to[1]) > 1);
         chessPieces[from[0]][from[1]] = null;
@@ -142,8 +147,7 @@ public class Chessboard {
 
 
     public Chessboard checkAndMove(int[] from, int[] to) {
-        ArrayList<int[]> m = getPossibleMoves(from[0], from[1]);
-        for (int[] t : m)
+        for (int[] t : getPossibleMoves(from[0], from[1]))
             if (t[0] == to[0] && t[1] == to[1])
                 return move(from, t);
         return null;
@@ -152,6 +156,18 @@ public class Chessboard {
     private boolean inCheck(PlayerColor playerColor) {
         int[] pos = findChessPiece(ChessPieceType.KING, playerColor);
         return pos != null && isThreatenedField(pos[0], pos[1], playerColor.otherColor());
+    }
+
+    private int countChessPieces(PlayerColor playerColor, ChessPieceType... chessPieceTypes) {
+        List<ChessPieceType> lChessPieceTypes = Arrays.asList(chessPieceTypes);
+        int count = 0;
+
+        for (int y = 0; y < 8; y++)
+            for (int x = 0; x < 8; x++)
+                if (chessPieces[x][y] != null && lChessPieceTypes.contains(chessPieces[x][y].chessPieceType) && chessPieces[x][y].playerColor == playerColor)
+                    count++;
+
+        return count;
     }
 
     private int[] findChessPiece(ChessPieceType chessPieceType, PlayerColor playerColor) {

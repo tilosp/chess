@@ -1,6 +1,7 @@
 package de.tilosp.chess.gui;
 
 import de.tilosp.chess.localisation.Localisation;
+import de.tilosp.chess.player.ComputerPlayer;
 import de.tilosp.chess.player.LocalPlayer;
 
 import javax.swing.*;
@@ -125,7 +126,11 @@ public class NewGameGUI extends GUI {
 
     private void onStartButtonPressed() {
         if (onePlayerRadioButton.isSelected()) {
-            // TODO 1 Player
+            // player vs computer
+            if (colorComboBox.getSelectedIndex() == 0)
+                new ChessboardGUI(new LocalPlayer(), new ComputerPlayer()).setVisible(true);
+            else
+                new ChessboardGUI(new ComputerPlayer(), new LocalPlayer()).setVisible(true);
         } else {
             if (twoPlayerModeComboBox.getSelectedIndex() == 0) {
                 // 2 Players local

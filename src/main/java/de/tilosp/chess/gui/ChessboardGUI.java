@@ -1,11 +1,9 @@
 package de.tilosp.chess.gui;
 
 import de.tilosp.chess.icon.Icons;
-import de.tilosp.chess.lib.ChessPiece;
-import de.tilosp.chess.lib.ChessPieceType;
-import de.tilosp.chess.lib.Chessboard;
-import de.tilosp.chess.lib.PlayerColor;
+import de.tilosp.chess.lib.*;
 import de.tilosp.chess.localisation.Localisation;
+import de.tilosp.chess.player.ComputerPlayer;
 import de.tilosp.chess.player.LocalPlayer;
 import de.tilosp.chess.player.Player;
 
@@ -23,13 +21,16 @@ public class ChessboardGUI extends GUI {
     private static final Border BORDER_SIDE_PANEL = BorderFactory.createCompoundBorder(BORDER_BEVEL_RAISED, BORDER_BEVEL_LOWERED);
 
     private static final Font FONT_LABEL = new Font(null, 0, 75);
-    private static final Font FONT_LABEL_TOP = new Font(null, Font.BOLD, 45);
+    private static final Font FONT_LABEL_PLAYER = new Font(null, Font.BOLD, 45);
+    private static final Font FONT_LABEL_EVALUATION = new Font(null, 0, 20);
 
     private ChessboardButton[][] boardButtons;
     private JButton[] promotionButtons;
     private JLabel[] topLabels;
     private JLabel[] leftLabels;
-    private JLabel topLabel;
+    private JLabel playerLabel;
+    private JLabel timeLabel;
+    private JLabel evaluationLabel;
     private JPanel chessboardPanel;
     private JPanel promotionPanel;
 
@@ -42,7 +43,14 @@ public class ChessboardGUI extends GUI {
 
     public ChessboardGUI(Player player1, Player player2) {
         super();
+
         players = new Player[] { player1, player2 };
+        players[0].init(PlayerColor.WHITE, this);
+        players[1].init(PlayerColor.BLACK, this);
+
+        if (players[0] instanceof ComputerPlayer) // compute first turn
+            players[0].sendUpdate(chessboard);
+
         cheatCheckBoxMenuItem.setEnabled(players[0] instanceof LocalPlayer && players[1] instanceof LocalPlayer);
     }
 
@@ -102,12 +110,22 @@ public class ChessboardGUI extends GUI {
 
 
         sidePanel.add(Box.createVerticalGlue(), BorderLayout.CENTER);
-        topLabel = new JLabel();
-        topLabel.setFont(FONT_LABEL_TOP);
-        topLabel.setBorder(BORDER_INSERTS);
-        topLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        sidePanel.add(topLabel, BorderLayout.PAGE_START);
+        JPanel sideTopPanel = new JPanel();
+        sideTopPanel.setLayout(new BoxLayout(sideTopPanel, BoxLayout.Y_AXIS));
+        sidePanel.add(sideTopPanel, BorderLayout.PAGE_START);
+
+        playerLabel = new JLabel();
+        playerLabel.setFont(FONT_LABEL_PLAYER);
+        playerLabel.setBorder(BORDER_INSERTS);
+        playerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sideTopPanel.add(playerLabel);
+
+        evaluationLabel = new JLabel();
+        evaluationLabel.setFont(FONT_LABEL_EVALUATION);
+        evaluationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sideTopPanel.add(evaluationLabel);
+
 
         // add promotion buttons
         promotionPanel = new JPanel(new GridLayout(2, 2));
@@ -211,6 +229,7 @@ public class ChessboardGUI extends GUI {
                 Chessboard move = chessboard.checkAndMove(selected, new int[] { x, y });
                 if (move != null) {
                     chessboard = move;
+                    for (Player p : players) p.sendUpdate(chessboard);
                     selected = null;
                     updateIcons();
                     updateBackground();
@@ -224,10 +243,19 @@ public class ChessboardGUI extends GUI {
     private void promotionButtonPressed(int i) {
         if (chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer) {
             chessboard = chessboard.promotion(ChessPieceType.POSITIONS_PROMOTION[i]);
+            for (Player p : players) p.sendUpdate(chessboard);
             updateIcons();
             chessboardPanel.repaint();
             updateGameState();
         }
+    }
+
+    public void externalUpdate(Chessboard chessboard) {
+        this.chessboard = chessboard;
+        for (Player p : players) p.sendUpdate(chessboard);
+        updateIcons();
+        chessboardPanel.repaint();
+        updateGameState();
     }
 
     private void updateBackground() {
@@ -270,7 +298,10 @@ public class ChessboardGUI extends GUI {
         for (int i = 0; i < 4; i++)
             promotionButtons[i].setIcon(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer ? Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]) : null);
 
-        topLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
+        playerLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
+
+        int value = ChessComputer.computeValue(chessboard);
+        evaluationLabel.setText((value < 0 ? "-" : (value > 0 ? "+" : "")) + (Math.abs(value) / 100) + "." + (Math.abs(value) % 100 / 10) + (Math.abs(value) % 10));
     }
 
     private void updateGameState() {
