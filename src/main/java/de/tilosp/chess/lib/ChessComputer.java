@@ -10,20 +10,20 @@ public class ChessComputer {
     public static Chessboard compute(Chessboard chessboard) {
         long time = System.currentTimeMillis();
 
-        int bestScore = Integer.MIN_VALUE;
+        int bestValue = Integer.MIN_VALUE;
         ArrayList<Chessboard> bestMoves = new ArrayList<>();
-        for (Chessboard move : getPossibleMoves(chessboard)) {
-            int score = -negamax(move, move.endGame ? 8 : 4, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            if (score > bestScore) {
-                bestScore = score;
+        for (Chessboard c : getPossibleMoves(chessboard)) {
+            int value = -negamax(c, chessboard.endGame ? 6 : 3, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
+            if (value > bestValue) {
+                bestValue = value;
                 bestMoves = new ArrayList<>();
-                bestMoves.add(move);
-            } else if (score == bestScore) {
-                bestMoves.add(move);
+                bestMoves.add(c);
+            } else if (value == bestValue) {
+                bestMoves.add(c);
             }
         }
 
-        System.out.println("compute took " + (System.currentTimeMillis() - time)+ " ms");
+        System.out.println("compute took " + (System.currentTimeMillis() - time)+ " ms, " + bestMoves.size());
         return bestMoves.get(random.nextInt(bestMoves.size()));
     }
 
