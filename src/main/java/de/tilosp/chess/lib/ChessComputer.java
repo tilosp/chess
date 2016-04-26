@@ -35,6 +35,7 @@ public class ChessComputer {
     }
 
     private static <T> ArrayList<List<T>> splitList(ArrayList<T> list, int parts) {
+        parts = Math.min(parts, list.size());
         ArrayList<List<T>> lists = new ArrayList<>(parts);
 
         int partSize = list.size() / parts;
