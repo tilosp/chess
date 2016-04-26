@@ -300,7 +300,7 @@ public class ChessboardGUI extends GUI {
 
         playerLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
 
-        int value = ChessComputer.computeValue(chessboard);
+        int value = ChessEngine.computeValue(chessboard);
         evaluationLabel.setText((value < 0 ? "-" : (value > 0 ? "+" : "")) + (Math.abs(value) / 100) + "." + (Math.abs(value) % 100 / 10) + (Math.abs(value) % 10));
     }
 
