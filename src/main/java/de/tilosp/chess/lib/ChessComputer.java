@@ -23,7 +23,7 @@ public class ChessComputer {
             }
         }
 
-        System.out.println("compute took " + (System.currentTimeMillis() - time)+ " ms, " + bestMoves.size());
+        System.out.println("compute took " + (System.currentTimeMillis() - time)+ " ms, " + bestMoves.size() + " move(s) with score " + bestValue);
         return bestMoves.get(random.nextInt(bestMoves.size()));
     }
 
