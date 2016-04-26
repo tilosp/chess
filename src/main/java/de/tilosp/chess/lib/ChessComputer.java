@@ -1,6 +1,7 @@
 package de.tilosp.chess.lib;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ChessComputer {
@@ -10,21 +11,38 @@ public class ChessComputer {
     public static Chessboard compute(Chessboard chessboard) {
         long time = System.currentTimeMillis();
 
+        List<CThread> threads = new ArrayList<>();
+        for (List<Chessboard> partPossibleMoves : splitList(getPossibleMoves(chessboard), Runtime.getRuntime().availableProcessors())) {
+            CThread thread = new CThread(chessboard.endGame, partPossibleMoves);
+            threads.add(thread);
+            thread.start();
+        }
+
         int bestValue = Integer.MIN_VALUE;
         ArrayList<Chessboard> bestMoves = new ArrayList<>();
-        for (Chessboard c : getPossibleMoves(chessboard)) {
-            int value = -negamax(c, chessboard.endGame ? 6 : 3, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
-            if (value > bestValue) {
-                bestValue = value;
-                bestMoves = new ArrayList<>();
-                bestMoves.add(c);
-            } else if (value == bestValue) {
-                bestMoves.add(c);
+        for (CThread thread : threads) {
+            CThread.Result result = thread.getResult();
+            if (result.bestValue > bestValue) {
+                bestValue = result.bestValue;
+                bestMoves = result.bestMoves;
+            } else if (result.bestValue == bestValue) {
+                bestMoves.addAll(result.bestMoves);
             }
         }
 
         System.out.println("compute took " + (System.currentTimeMillis() - time)+ " ms, " + bestMoves.size() + " move(s) with score " + bestValue);
         return bestMoves.get(random.nextInt(bestMoves.size()));
+    }
+
+    private static <T> ArrayList<List<T>> splitList(ArrayList<T> list, int parts) {
+        ArrayList<List<T>> lists = new ArrayList<>(parts);
+
+        int partSize = list.size() / parts;
+
+        for (int i = 0; i < parts; i++)
+            lists.add(list.subList(i * partSize, i + 1 == parts ? list.size() : (i + 1) * partSize));
+
+        return lists;
     }
 
     private static ArrayList<Chessboard> getPossibleMoves(Chessboard chessboard){
@@ -102,5 +120,50 @@ public class ChessComputer {
             }
         }
         return threatenedMatrix;
+    }
+
+    private static final class CThread extends Thread {
+
+        private final boolean endGame;
+        private final List<Chessboard> moves;
+        private ArrayList<Chessboard> bestMoves = new ArrayList<>();
+        private int bestValue = Integer.MIN_VALUE;
+
+        private CThread(boolean endGame, List<Chessboard> moves) {
+            this.endGame = endGame;
+            this.moves = moves;
+        }
+
+        private Result getResult() {
+            try {
+                join();
+            } catch (InterruptedException ignored) {}
+            return new Result(bestValue, bestMoves);
+        }
+
+        @Override
+        public void run() {
+            for (Chessboard c : moves) {
+                int value = -negamax(c, endGame ? 6 : 3, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestMoves = new ArrayList<>();
+                    bestMoves.add(c);
+                } else if (value == bestValue) {
+                    bestMoves.add(c);
+                }
+            }
+        }
+
+        private static final class Result {
+
+            final int bestValue;
+            final ArrayList<Chessboard> bestMoves;
+
+            private Result(int bestValue, ArrayList<Chessboard> bestMoves) {
+                this.bestValue = bestValue;
+                this.bestMoves = bestMoves;
+            }
+        }
     }
 }
