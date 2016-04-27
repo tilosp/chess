@@ -70,7 +70,13 @@ public class ChessEngine {
 
     // negamax algorithm with alpha beta pruning https://en.wikipedia.org/wiki/Negamax
     private static int negamax(Chessboard chessboard, int depth, int alpha, int beta) {
-        if (depth == 0 || chessboard.isDraw() || chessboard.isWin(PlayerColor.WHITE) || chessboard.isWin(PlayerColor.BLACK))
+        if (chessboard.isDraw())
+            return chessboard.playerColor.sign * computeValue(chessboard) / 2;
+        if (chessboard.isWin(PlayerColor.WHITE))
+            return chessboard.playerColor.sign * 10000;
+        if (chessboard.isWin(PlayerColor.BLACK))
+            return chessboard.playerColor.sign * -10000;
+        if (depth == 0)
             return chessboard.playerColor.sign * computeValue(chessboard);
 
         int bestValue = Integer.MIN_VALUE;
