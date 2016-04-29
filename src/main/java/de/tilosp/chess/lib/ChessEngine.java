@@ -73,9 +73,9 @@ public class ChessEngine {
         if (chessboard.isDraw())
             return chessboard.playerColor.sign * computeValue(chessboard) / 2;
         if (chessboard.isWin(PlayerColor.WHITE))
-            return chessboard.playerColor.sign * 10000;
+            return chessboard.playerColor.sign * (computeValue(chessboard) + 1000);
         if (chessboard.isWin(PlayerColor.BLACK))
-            return chessboard.playerColor.sign * -10000;
+            return chessboard.playerColor.sign * (computeValue(chessboard) - 1000);
         if (depth == 0)
             return chessboard.playerColor.sign * computeValue(chessboard);
 
@@ -151,7 +151,7 @@ public class ChessEngine {
         @Override
         public void run() {
             for (Chessboard c : moves) {
-                int value = -negamax(c, endGame ? 6 : 3, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
+                int value = -negamax(c, endGame ? 3 : 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
                 if (value > bestValue) {
                     bestValue = value;
                     bestMoves = new ArrayList<>();
