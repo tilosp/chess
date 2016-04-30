@@ -36,10 +36,15 @@ public class ChessboardGUI extends GUI {
 
     private JMenuItem newMenuItem;
     private JCheckBoxMenuItem cheatCheckBoxMenuItem;
+    private JRadioButtonMenuItem normalRadioButtonMenuItem;
+    private JRadioButtonMenuItem reversedRadioButtonMenuItem;
+    private JRadioButtonMenuItem automaticRadioButtonMenuItem;
+
 
     private final Player[] players;
     private Chessboard chessboard;
     private int[] selected;
+    private boolean reversed;
 
     public ChessboardGUI(Player player1, Player player2) {
         super();
@@ -64,11 +69,23 @@ public class ChessboardGUI extends GUI {
         // initialise menu bar
         JMenuBar menu = new JMenuBar();
         setJMenuBar(menu);
+
         JMenu gameMenu = new JMenu(Localisation.getString("chessboard.menu_bar.game"));
         menu.add(gameMenu);
         gameMenu.add(newMenuItem = new JMenuItem(Localisation.getString("chessboard.menu_bar.game.new")));
         gameMenu.addSeparator();
         gameMenu.add(cheatCheckBoxMenuItem = new JCheckBoxMenuItem(Localisation.getString("chessboard.menu_bar.game.cheat_mode")));
+
+        JMenu chessboardMenu = new JMenu(Localisation.getString("chessboard.menu_bar.chessboard"));
+        menu.add(chessboardMenu);
+        ButtonGroup buttonGroup = new ButtonGroup();
+        chessboardMenu.add(normalRadioButtonMenuItem = new JRadioButtonMenuItem(Localisation.getString("chessboard.menu_bar.chessboard.normal")));
+        buttonGroup.add(normalRadioButtonMenuItem);
+        normalRadioButtonMenuItem.setSelected(true);
+        chessboardMenu.add(reversedRadioButtonMenuItem = new JRadioButtonMenuItem(Localisation.getString("chessboard.menu_bar.chessboard.reversed")));
+        buttonGroup.add(reversedRadioButtonMenuItem);
+        chessboardMenu.add(automaticRadioButtonMenuItem = new JRadioButtonMenuItem(Localisation.getString("chessboard.menu_bar.chessboard.automatic")));
+        buttonGroup.add(automaticRadioButtonMenuItem);
 
         chessboard = new Chessboard();
 
@@ -155,22 +172,35 @@ public class ChessboardGUI extends GUI {
             // Open NewGameGUI Window
             new NewGameGUI().setVisible(true);
         });
+        ItemListener listener = e -> {
+            if (normalRadioButtonMenuItem.isSelected())
+                reversed = false;
+            else if (reversedRadioButtonMenuItem.isSelected())
+                reversed = true;
+            updateInverted();
+            updateIcons();
+            updateBackground();
+        };
+        normalRadioButtonMenuItem.addItemListener(listener);
+        reversedRadioButtonMenuItem.addItemListener(listener);
+        automaticRadioButtonMenuItem.addItemListener(listener);
+
         // chessboard listeners
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 final int fX = x, fY = y;
-                boardButtons[x][y].addActionListener(e -> buttonPressed(fX, fY));
+                boardButtons[x][y].addActionListener(e -> buttonPressed(fX, reversed ? 7 - fY : fY));
                 boardButtons[x][y].addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         if (cheatCheckBoxMenuItem.isSelected()) {
                             if (e.getButton() == MouseEvent.BUTTON2) { // middle click
-                                chessboard = chessboard.cycleColor(fX, fY);
+                                chessboard = chessboard.cycleColor(fX, reversed ? 7 - fY : fY);
                                 selected = null;
                                 updateIcons();
                                 updateBackground();
                             } else if (e.getButton() == MouseEvent.BUTTON3) { // right click
-                                chessboard = chessboard.cycleChessPieceType(fX, fY);
+                                chessboard = chessboard.cycleChessPieceType(fX, reversed ? 7 - fY : fY);
                                 selected = null;
                                 updateIcons();
                                 updateBackground();
@@ -223,7 +253,10 @@ public class ChessboardGUI extends GUI {
     private void buttonPressed(int x, int y) {
         if (!chessboard.promotion) {
             if (chessboard.getChessPiece(x, y) != null && chessboard.getChessPiece(x, y).playerColor == chessboard.playerColor && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer && !chessboard.getPossibleMoves(x, y).isEmpty()) {
-                selected = new int[] { x, y };
+                if (selected != null && x == selected[0] && y == selected[1])
+                    selected = null;
+                else
+                    selected = new int[] { x, y };
                 updateBackground();
             } else if (selected != null) {
                 Chessboard move = chessboard.checkAndMove(selected, new int[] { x, y });
@@ -231,6 +264,7 @@ public class ChessboardGUI extends GUI {
                     chessboard = move;
                     for (Player p : players) p.sendUpdate(chessboard);
                     selected = null;
+                    updateInverted();
                     updateIcons();
                     updateBackground();
                     if (!chessboard.promotion)
@@ -244,6 +278,7 @@ public class ChessboardGUI extends GUI {
         if (chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer) {
             chessboard = chessboard.promotion(ChessPieceType.POSITIONS_PROMOTION[i]);
             for (Player p : players) p.sendUpdate(chessboard);
+            updateInverted();
             updateIcons();
             chessboardPanel.repaint();
             updateGameState();
@@ -253,6 +288,7 @@ public class ChessboardGUI extends GUI {
     public void externalUpdate(Chessboard chessboard) {
         this.chessboard = chessboard;
         for (Player p : players) p.sendUpdate(chessboard);
+        updateInverted();
         updateIcons();
         chessboardPanel.repaint();
         updateGameState();
@@ -263,9 +299,9 @@ public class ChessboardGUI extends GUI {
             for (int x = 0; x < 8; x++)
                 boardButtons[x][y].iconReset();
         if (selected != null) {
-            boardButtons[selected[0]][selected[1]].iconSelected();
+            boardButtons[selected[0]][reversed ? 7 - selected[1] : selected[1]].iconSelected();
             for (int[] m : chessboard.getPossibleMoves(selected[0], selected[1]))
-                boardButtons[m[0]][m[1]].iconShow();
+                boardButtons[m[0]][reversed ? 7 - m[1] : m[1]].iconShow();
         }
         chessboardPanel.repaint();
     }
@@ -290,7 +326,7 @@ public class ChessboardGUI extends GUI {
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 ChessPiece chessPiece = chessboard.getChessPiece(x, y);
-                boardButtons[x][y].setIcon(chessPiece != null ? Icons.getIcon(chessPiece.playerColor, chessPiece.chessPieceType) : null);
+                boardButtons[x][reversed ? 7 - y : y].setIcon(chessPiece != null ? Icons.getIcon(chessPiece.playerColor, chessPiece.chessPieceType) : null);
             }
         }
 
@@ -312,5 +348,13 @@ public class ChessboardGUI extends GUI {
         } else if (chessboard.isWin(PlayerColor.BLACK)) {
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.black_won"), Localisation.getString("chessboard.message.black_won"), JOptionPane.PLAIN_MESSAGE);
         }
+    }
+
+    private void updateInverted() {
+        if (automaticRadioButtonMenuItem.isSelected()) {
+            reversed = chessboard.playerColor == PlayerColor.BLACK;
+        }
+        for (int i = 0; i < 8; i++)
+            leftLabels[reversed ? 7 - i : i].setText(Integer.toString(8 - i));
     }
 }
