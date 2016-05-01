@@ -350,18 +350,23 @@ public class ChessboardGUI extends GUI implements WindowListener {
         playerLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
 
         int value = ChessEngine.computeValue(chessboard);
-        evaluationLabel.setText((value < 0 ? "-" : (value > 0 ? "+" : "")) + (Math.abs(value) / 100) + "." + (Math.abs(value) % 100 / 10) + (Math.abs(value) % 10));
+        evaluationLabel.setText(String.format("%+d.%02d", value / 100, Math.abs(value) % 100));
     }
 
     private void updateGameState() {
-        if (chessboard.isDraw())
+        if (chessboard.isDraw()) {
+            timerThread.running = false;
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.draw"), Localisation.getString("chessboard.message.draw"), JOptionPane.PLAIN_MESSAGE);
-        else if (chessboard.isWin(PlayerColor.WHITE))
+        } else if (chessboard.isWin(PlayerColor.WHITE)) {
+            timerThread.running = false;
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.white_won"), Localisation.getString("chessboard.message.white_won"), JOptionPane.PLAIN_MESSAGE);
-        else if (chessboard.isWin(PlayerColor.BLACK))
+        } else if (chessboard.isWin(PlayerColor.BLACK)) {
+            timerThread.running = false;
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.black_won"), Localisation.getString("chessboard.message.black_won"), JOptionPane.PLAIN_MESSAGE);
-        time = 0;
-        updateTimer();
+        } else {
+            time = 0;
+            updateTimer();
+        }
     }
 
     private void updateInverted() {
