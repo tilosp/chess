@@ -13,7 +13,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ChessboardGUI extends GUI {
+public class ChessboardGUI extends GUI implements WindowListener {
 
     private static final Border BORDER_INSERTS = BorderFactory.createEmptyBorder(5, 5, 5, 5);
     private static final Border BORDER_BEVEL_RAISED = BorderFactory.createBevelBorder(BevelBorder.RAISED);
@@ -22,6 +22,7 @@ public class ChessboardGUI extends GUI {
 
     private static final Font FONT_LABEL = new Font(null, 0, 75);
     private static final Font FONT_LABEL_PLAYER = new Font(null, Font.BOLD, 45);
+    private static final Font FONT_LABEL_TIME = new Font(null, 0, 35);
     private static final Font FONT_LABEL_EVALUATION = new Font(null, 0, 20);
 
     private ChessboardButton[][] boardButtons;
@@ -29,7 +30,7 @@ public class ChessboardGUI extends GUI {
     private JLabel[] topLabels;
     private JLabel[] leftLabels;
     private JLabel playerLabel;
-    private JLabel timeLabel;
+    private JLabel timerLabel;
     private JLabel evaluationLabel;
     private JPanel chessboardPanel;
     private JPanel promotionPanel;
@@ -40,14 +41,18 @@ public class ChessboardGUI extends GUI {
     private JRadioButtonMenuItem reversedRadioButtonMenuItem;
     private JRadioButtonMenuItem automaticRadioButtonMenuItem;
 
-
+    private int time;
     private final Player[] players;
     private Chessboard chessboard;
     private int[] selected;
     private boolean reversed;
 
+    private TimerThread timerThread = new TimerThread();
+
     public ChessboardGUI(Player player1, Player player2) {
         super();
+
+        addWindowListener(this);
 
         players = new Player[] { player1, player2 };
         players[0].init(PlayerColor.WHITE, this);
@@ -57,6 +62,8 @@ public class ChessboardGUI extends GUI {
             players[0].sendUpdate(chessboard);
 
         cheatCheckBoxMenuItem.setEnabled(players[0] instanceof LocalPlayer && players[1] instanceof LocalPlayer);
+
+        timerThread.start();
     }
 
     @Override
@@ -138,8 +145,14 @@ public class ChessboardGUI extends GUI {
         playerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         sideTopPanel.add(playerLabel);
 
+        timerLabel = new JLabel("00:00");
+        timerLabel.setFont(FONT_LABEL_TIME);
+        timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sideTopPanel.add(timerLabel);
+
         evaluationLabel = new JLabel();
         evaluationLabel.setFont(FONT_LABEL_EVALUATION);
+        evaluationLabel.setBorder(BORDER_INSERTS);
         evaluationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         sideTopPanel.add(evaluationLabel);
 
@@ -341,13 +354,14 @@ public class ChessboardGUI extends GUI {
     }
 
     private void updateGameState() {
-        if (chessboard.isDraw()) {
+        if (chessboard.isDraw())
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.draw"), Localisation.getString("chessboard.message.draw"), JOptionPane.PLAIN_MESSAGE);
-        } else if (chessboard.isWin(PlayerColor.WHITE)) {
+        else if (chessboard.isWin(PlayerColor.WHITE))
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.white_won"), Localisation.getString("chessboard.message.white_won"), JOptionPane.PLAIN_MESSAGE);
-        } else if (chessboard.isWin(PlayerColor.BLACK)) {
+        else if (chessboard.isWin(PlayerColor.BLACK))
             JOptionPane.showMessageDialog(this, Localisation.getString("chessboard.message.black_won"), Localisation.getString("chessboard.message.black_won"), JOptionPane.PLAIN_MESSAGE);
-        }
+        time = 0;
+        updateTimer();
     }
 
     private void updateInverted() {
@@ -356,5 +370,62 @@ public class ChessboardGUI extends GUI {
         }
         for (int i = 0; i < 8; i++)
             leftLabels[reversed ? 7 - i : i].setText(Integer.toString(8 - i));
+    }
+
+    private void updateTimer() {
+        timerLabel.setText(String.format("%02d:%02d", time / 60, time % 60));
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        timerThread.running = false;
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+
+    }
+
+    private final class TimerThread extends Thread {
+
+        private volatile boolean running = true;
+
+        @Override
+        public void run() {
+            while (running) {
+                try {
+                    sleep(1000);
+                } catch (InterruptedException ignored) {}
+                SwingUtilities.invokeLater(() -> {
+                    time++;
+                    updateTimer();
+                });
+            }
+        }
     }
 }
