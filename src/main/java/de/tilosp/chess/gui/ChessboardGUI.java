@@ -33,7 +33,6 @@ public class ChessboardGUI extends GUI implements WindowListener {
     private JLabel timerLabel;
     private JLabel evaluationLabel;
     private JPanel chessboardPanel;
-    private JPanel promotionPanel;
 
     private JMenuItem newMenuItem;
     private JCheckBoxMenuItem cheatCheckBoxMenuItem;
@@ -158,7 +157,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
 
 
         // add promotion buttons
-        promotionPanel = new JPanel(new GridLayout(2, 2));
+        JPanel promotionPanel = new JPanel(new GridLayout(2, 2));
         promotionPanel.setBorder(BORDER_INSERTS);
         for (int i = 0; i < 4; i++) {
             JButton button = new JButton();
