@@ -119,7 +119,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
         for (int y = 0; y < 8; y++) {
             chessboardPanel.add(leftLabels[y] = newLabel(Integer.toString(8 - y)));
             for (int x = 0; x < 8; x++)
-                chessboardPanel.add(boardButtons[x][y] = new ChessboardButton(((x ^ y) & 1) == 0));
+                chessboardPanel.add(boardButtons[x][y] = new ChessboardButton());
         }
 
         // initialise side panel
@@ -309,7 +309,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
     private void updateBackground() {
         for (int y = 0; y < 8; y++)
             for (int x = 0; x < 8; x++)
-                boardButtons[x][y].iconReset();
+                boardButtons[x][y].iconReset(((x ^ y) & 1) == 0 ^ reversed);
         if (selected != null) {
             boardButtons[selected[0]][reversed ? 7 - selected[1] : selected[1]].iconSelected();
             for (int[] m : chessboard.getPossibleMoves(selected[0], selected[1]))

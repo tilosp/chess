@@ -21,9 +21,8 @@ class ChessboardButton extends JButton implements MouseListener {
     private ImageIcon icon;
     private int iconSet = 0;
 
-    ChessboardButton(boolean background) {
+    ChessboardButton() {
         super();
-        this.background = background;
         addMouseListener(this);
         setPreferredSize(new Dimension(100, 100));
         setBorder(null);
@@ -53,8 +52,9 @@ class ChessboardButton extends JButton implements MouseListener {
         }
     }
 
-    void iconReset() {
+    void iconReset(boolean background) {
         iconSet = 0;
+        this.background = background;
     }
 
     void iconSelected() {
