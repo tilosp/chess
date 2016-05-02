@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Chessboard {
+public final class Chessboard {
 
     private static final ChessPiece[][] INITIAL_POSITIONS = new ChessPiece[8][8];
 

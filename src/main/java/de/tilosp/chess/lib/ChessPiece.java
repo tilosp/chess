@@ -1,6 +1,6 @@
 package de.tilosp.chess.lib;
 
-public class ChessPiece {
+public final class ChessPiece {
 
     public final ChessPieceType chessPieceType;
     public final PlayerColor playerColor;
