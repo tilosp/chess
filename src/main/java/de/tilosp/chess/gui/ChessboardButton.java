@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class ChessboardButton extends JButton implements MouseListener {
+class ChessboardButton extends JButton implements MouseListener {
 
     private static final Color COLOR_1 = new Color(255, 206, 158);
     private static final Color COLOR_1_B = new Color(255, 222, 174);
@@ -21,7 +21,7 @@ public class ChessboardButton extends JButton implements MouseListener {
     private ImageIcon icon;
     private int iconSet = 0;
 
-    public ChessboardButton(boolean background) {
+    ChessboardButton(boolean background) {
         super();
         this.background = background;
         addMouseListener(this);
