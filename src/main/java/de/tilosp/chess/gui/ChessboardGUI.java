@@ -46,7 +46,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
     private int[] selected;
     private boolean reversed;
 
-    private TimerThread timerThread = new TimerThread();
+    private final TimerThread timerThread = new TimerThread();
 
     ChessboardGUI(Player player1, Player player2) {
         super();

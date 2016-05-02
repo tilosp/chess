@@ -4,7 +4,7 @@ import javax.swing.*;
 
 abstract class GUI extends JFrame {
 
-    JPanel panel;
+    final JPanel panel;
 
     GUI() {
         // create panel

@@ -6,7 +6,7 @@ import java.util.Random;
 
 public final class ChessEngine {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     public static Chessboard compute(Chessboard chessboard) {
         long time = System.currentTimeMillis();
