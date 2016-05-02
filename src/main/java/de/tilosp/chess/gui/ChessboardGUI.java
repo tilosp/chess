@@ -48,7 +48,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
 
     private TimerThread timerThread = new TimerThread();
 
-    public ChessboardGUI(Player player1, Player player2) {
+    ChessboardGUI(Player player1, Player player2) {
         super();
 
         addWindowListener(this);
