@@ -4,7 +4,7 @@ import de.tilosp.chess.lib.ChessEngine;
 import de.tilosp.chess.lib.Chessboard;
 import de.tilosp.chess.lib.PlayerColor;
 
-public class ComputerPlayer extends Player {
+public final class ComputerPlayer extends Player {
 
     @Override
     public void sendUpdate(Chessboard chessboard) {
