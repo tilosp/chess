@@ -97,7 +97,7 @@ public final class Chessboard {
         return possibilities;
     }
 
-    ArrayList<int[]> getThreatenedFields(int x, int y) {
+    private ArrayList<int[]> getThreatenedFields(int x, int y) {
         ArrayList<int[]> possibilities = new ArrayList<>();
         ChessPiece chessPiece = chessPieces[x][y];
         if (chessPiece != null) {
