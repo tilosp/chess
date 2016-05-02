@@ -111,7 +111,9 @@ public class ChessEngine {
         return value;
     }
 
-    private static int[][] computeThreatenedMatrix(Chessboard chessboard) {
+
+    // unused
+    /*private static int[][] computeThreatenedMatrix(Chessboard chessboard) {
         int[][] threatenedMatrix = new int[8][8];
         for (int i1 = 0; i1 < 8; i1++) {
             for (int i2 = 0; i2 < 8; i2++) {
@@ -127,7 +129,7 @@ public class ChessEngine {
             }
         }
         return threatenedMatrix;
-    }
+    }*/
 
     private static final class CThread extends Thread {
 
