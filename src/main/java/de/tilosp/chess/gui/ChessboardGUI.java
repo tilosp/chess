@@ -33,6 +33,8 @@ public class ChessboardGUI extends GUI implements WindowListener {
     private JLabel timerLabel;
     private JLabel evaluationLabel;
     private JPanel chessboardPanel;
+    private JPanel promotionPanel;
+    private JPanel historyPanel;
 
     private JMenuItem newMenuItem;
     private JCheckBoxMenuItem cheatCheckBoxMenuItem;
@@ -131,13 +133,16 @@ public class ChessboardGUI extends GUI implements WindowListener {
         sidePanelO.add(sidePanel, BorderLayout.CENTER);
         sidePanel.setBorder(BORDER_SIDE_PANEL);
 
-
-        sidePanel.add(Box.createVerticalGlue(), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(historyPanel = new JPanel());
+        scrollPane.setBorder(null);
+        sidePanel.add(scrollPane, BorderLayout.CENTER);
+        historyPanel.setLayout(new BoxLayout(historyPanel, BoxLayout.Y_AXIS));
 
         JPanel sideTopPanel = new JPanel();
         sideTopPanel.setLayout(new BoxLayout(sideTopPanel, BoxLayout.Y_AXIS));
         sidePanel.add(sideTopPanel, BorderLayout.PAGE_START);
 
+        sideTopPanel.add(Box.createHorizontalStrut(210));
         playerLabel = new JLabel();
         playerLabel.setFont(FONT_LABEL_PLAYER);
         playerLabel.setBorder(BORDER_INSERTS);
@@ -157,11 +162,10 @@ public class ChessboardGUI extends GUI implements WindowListener {
 
 
         // add promotion buttons
-        JPanel promotionPanel = new JPanel(new GridLayout(2, 2));
+        promotionPanel = new JPanel(new GridLayout(2, 2));
         promotionPanel.setBorder(BORDER_INSERTS);
         for (int i = 0; i < 4; i++) {
             JButton button = new JButton();
-            button.setPreferredSize(new Dimension(100, 100));
             button.setContentAreaFilled(false);
             button.setBorder(null);
             promotionPanel.add(promotionButtons[i] = button);
@@ -344,7 +348,8 @@ public class ChessboardGUI extends GUI implements WindowListener {
 
         // update promotion icons
         for (int i = 0; i < 4; i++)
-            promotionButtons[i].setIcon(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer ? Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]) : null);
+            promotionButtons[i].setIcon(Icons.getIcon(chessboard.playerColor, ChessPieceType.POSITIONS_PROMOTION[i]));
+        promotionPanel.setVisible(chessboard.promotion && players[chessboard.playerColor.ordinal()] instanceof LocalPlayer);
 
         playerLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
 
