@@ -8,7 +8,7 @@ public final class ChessPiece {
     private final int movedInTurn;
     private final boolean enPassant;
 
-    public ChessPiece(ChessPieceType chessPieceType, PlayerColor playerColor) {
+    ChessPiece(ChessPieceType chessPieceType, PlayerColor playerColor) {
         this(chessPieceType, playerColor, 0, 0, false);
     }
 
@@ -20,31 +20,31 @@ public final class ChessPiece {
         this.enPassant = enPassant;
     }
 
-    public int[][] getMove() {
+    int[][] getMove() {
         return chessPieceType.getMove(notMoved());
     }
 
-    public int[][] getCapture() {
+    int[][] getCapture() {
         return chessPieceType.capture;
     }
 
-    public ChessPiece moved(int turn, boolean enPassant) {
+    ChessPiece moved(int turn, boolean enPassant) {
         return new ChessPiece(chessPieceType, playerColor, movements + 1, turn, enPassant);
     }
 
-    public ChessPiece promotion(ChessPieceType chessPieceType) {
+    ChessPiece promotion(ChessPieceType chessPieceType) {
         return new ChessPiece(chessPieceType, playerColor, movements, movedInTurn, false);
     }
 
-    public boolean notMoved() {
+    boolean notMoved() {
         return movements == 0;
     }
 
-    public boolean checkEnPassant(int turn) {
+    boolean checkEnPassant(int turn) {
         return turn == movedInTurn + 1 && enPassant;
     }
 
-    public boolean checkPromotion(int y) {
+    boolean checkPromotion(int y) {
         return chessPieceType == ChessPieceType.PAWN && (playerColor == PlayerColor.WHITE ? 0 : 7) == y;
     }
 
