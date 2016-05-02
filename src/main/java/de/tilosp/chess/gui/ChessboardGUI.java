@@ -354,7 +354,7 @@ public class ChessboardGUI extends GUI implements WindowListener {
         playerLabel.setText(Localisation.getString("player_color." + chessboard.playerColor.toString().toLowerCase()));
 
         int value = ChessEngine.computeValue(chessboard);
-        evaluationLabel.setText(String.format("%+d.%02d", value / 100, Math.abs(value) % 100));
+        evaluationLabel.setText(String.format("%s%d.%02d", value > 0 ? "+" : value < 0 ? "-" : "", Math.abs(value) / 100, Math.abs(value) % 100));
     }
 
     private void updateGameState() {
