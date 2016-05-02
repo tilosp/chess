@@ -53,19 +53,19 @@ class ChessboardButton extends JButton implements MouseListener {
         }
     }
 
-    public void iconReset() {
+    void iconReset() {
         iconSet = 0;
     }
 
-    public void iconSelected() {
+    void iconSelected() {
         iconSet = 1;
     }
 
-    public void iconShow() {
+    void iconShow() {
         iconSet = 2;
     }
 
-    public void setIcon(ImageIcon icon) {
+    void setIcon(ImageIcon icon) {
         this.icon = icon;
     }
 
