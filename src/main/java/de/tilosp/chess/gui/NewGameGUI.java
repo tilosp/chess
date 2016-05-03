@@ -10,7 +10,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ItemListener;
 
-public class NewGameGUI extends GUI {
+public final class NewGameGUI extends GUI {
 
     private JButton startButton;
     private JRadioButton onePlayerRadioButton;

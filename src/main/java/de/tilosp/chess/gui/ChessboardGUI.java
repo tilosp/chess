@@ -13,7 +13,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ChessboardGUI extends GUI implements WindowListener {
+public final class ChessboardGUI extends GUI implements WindowListener {
 
     private static final Border BORDER_INSERTS = BorderFactory.createEmptyBorder(5, 5, 5, 5);
     private static final Border BORDER_BEVEL_RAISED = BorderFactory.createBevelBorder(BevelBorder.RAISED);
