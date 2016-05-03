@@ -2,7 +2,7 @@ package de.tilosp.chess.lib;
 
 public enum ChessPieceType {
 
-    KING(new int[][] {
+    KING('\u2654', '\u265A', new int[][] {
             { 0, 1, },
             { 0, -1 },
             { 1, 0 },
@@ -30,7 +30,7 @@ public enum ChessPieceType {
             { -40, -20, -10, -10, -10, -10, -30, -30 },
             { -50, -30, -30, -30, -30, -30, -30, -50 }
     }),
-    QUEEN(new int[][] {
+    QUEEN('\u2655', '\u265B', new int[][] {
             { 0, 1, 7 },
             { 0, -1, 7 },
             { 1, 0, 7 },
@@ -49,7 +49,7 @@ public enum ChessPieceType {
             { -10,   0,   0,  0, 0,   0,   0, -10 },
             { -20, -10, -10, -5, -5, -10, -10, -20 }
     }),
-    ROOK(new int[][] {
+    ROOK('\u2656', '\u265C', new int[][] {
             { 0, 1, 7 },
             { 0, -1, 7 },
             { 1, 0, 7 },
@@ -64,7 +64,7 @@ public enum ChessPieceType {
             { 0, 10,  0,  0,  0,  0,  0, 0 },
             { 0,  5, -5, -5, -5, -5, -5, 0 }
     }),
-    BISHOP(new int[][] {
+    BISHOP('\u2657', '\u265D', new int[][] {
             { 1, 1, 7 },
             { 1, -1, 7 },
             { -1, 1, 7 },
@@ -79,7 +79,7 @@ public enum ChessPieceType {
             { -10,   0,   0,   5,   0,  10,   5, -10 },
             { -20, -10, -10, -10, -10, -10, -10, -20 }
     }),
-    KNIGHT(new int[][] {
+    KNIGHT('\u2658', '\u265E', new int[][] {
             { 1, 2 },
             { -1, 2 },
             { 1, -2 },
@@ -98,7 +98,7 @@ public enum ChessPieceType {
             { -40, -20,   0,   5,   0,   5, -20, -40 },
             { -50, -40, -30, -30, -30, -30, -40, -50 }
     }),
-    PAWN(new int[][] {
+    PAWN('\u2659', '\u265F', new int[][] {
             { 0, 1 }
     }, new int[][] {
             { 0, 1, 2 }
@@ -121,6 +121,8 @@ public enum ChessPieceType {
     public static final ChessPieceType[] POSITIONS_FIRST_ROW = { ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };
     public static final ChessPieceType[] POSITIONS_PROMOTION = { QUEEN, KNIGHT, ROOK, BISHOP };
 
+    public final char symbolWhite;
+    public final char symbolBlack;
     public final int[][] capture;
     private final int[][] move;
     private final int[][] moveFirstTurn;
@@ -128,19 +130,21 @@ public enum ChessPieceType {
     private final int[][] squareValues; // bonuses for pieces standing well and penalties for pieces standing badly
     private final int[][] squareValuesEndGame;
 
-    ChessPieceType(int[][] move, int value, int[][] squareValues) {
-        this(move, move, move, value, squareValues);
+    ChessPieceType(char symbolWhite, char symbolBlack, int[][] move, int value, int[][] squareValues) {
+        this(symbolWhite, symbolBlack, move, move, move, value, squareValues);
     }
 
-    ChessPieceType(int[][] move, int value, int[][] squareValues, int[][] squareValuesEndGame) {
-        this(move, move, move, value, squareValues, squareValuesEndGame);
+    ChessPieceType(char symbolWhite, char symbolBlack, int[][] move, int value, int[][] squareValues, int[][] squareValuesEndGame) {
+        this(symbolWhite, symbolBlack, move, move, move, value, squareValues, squareValuesEndGame);
     }
 
-    ChessPieceType(int[][] move, int[][] moveFirstTurn, int[][] capture, int value, int[][] squareValues) {
-        this(move, moveFirstTurn, capture, value, squareValues, squareValues);
+    ChessPieceType(char symbolWhite, char symbolBlack, int[][] move, int[][] moveFirstTurn, int[][] capture, int value, int[][] squareValues) {
+        this(symbolWhite, symbolBlack, move, moveFirstTurn, capture, value, squareValues, squareValues);
     }
 
-    ChessPieceType(int[][] move, int[][] moveFirstTurn, int[][] capture, int value, int[][] squareValues, int[][] squareValuesEndGame) {
+    ChessPieceType(char symbolWhite, char symbolBlack, int[][] move, int[][] moveFirstTurn, int[][] capture, int value, int[][] squareValues, int[][] squareValuesEndGame) {
+        this.symbolWhite = symbolWhite;
+        this.symbolBlack = symbolBlack;
         this.move = move;
         this.moveFirstTurn = moveFirstTurn;
         this.capture = capture;

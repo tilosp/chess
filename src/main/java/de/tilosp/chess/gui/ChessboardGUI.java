@@ -23,7 +23,8 @@ public class ChessboardGUI extends GUI implements WindowListener {
     private static final Font FONT_LABEL = new Font(null, 0, 75);
     private static final Font FONT_LABEL_PLAYER = new Font(null, Font.BOLD, 45);
     private static final Font FONT_LABEL_TIME = new Font(null, 0, 35);
-    private static final Font FONT_LABEL_EVALUATION = new Font(null, 0, 20);
+    private static final Font FONT_LABEL_EVALUATION = new Font(null, 0, 25);
+    private static final Font FONT_LABEL_HISTORY = new Font(null, 0, 20);
 
     private ChessboardButton[][] boardButtons;
     private JButton[] promotionButtons;
@@ -371,6 +372,10 @@ public class ChessboardGUI extends GUI implements WindowListener {
             time = 0;
             updateTimer();
         }
+        JLabel label = new JLabel(chessboard.lastMove.getText());
+        label.setIcon(Icons.getTinyIcons(chessboard.lastMove.chessPiece.playerColor, chessboard.lastMove.chessPiece.chessPieceType));
+        label.setFont(FONT_LABEL_HISTORY);
+        historyPanel.add(label);
     }
 
     private void updateInverted() {

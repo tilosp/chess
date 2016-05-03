@@ -23,13 +23,14 @@ public final class Chessboard {
     private final int promotionX;
     private final int promotionY;
     final boolean endGame;
+    public final Move lastMove;
 
 
     public Chessboard() {
-        this(INITIAL_POSITIONS, 1, PlayerColor.WHITE, false, -1, -1);
+        this(INITIAL_POSITIONS, 1, PlayerColor.WHITE, false, -1, -1, null);
     }
 
-    private Chessboard(ChessPiece[][] chessPieces, int turn, PlayerColor playerColor, boolean promotion, int promotionX, int promotionY) {
+    private Chessboard(ChessPiece[][] chessPieces, int turn, PlayerColor playerColor, boolean promotion, int promotionX, int promotionY, Move lastMove) {
         this.chessPieces = chessPieces;
         this.turn = turn;
         this.playerColor = playerColor;
@@ -40,6 +41,7 @@ public final class Chessboard {
                 (countChessPieces(PlayerColor.WHITE, ChessPieceType.ROOK) == 0 && countChessPieces(PlayerColor.WHITE, ChessPieceType.BISHOP, ChessPieceType.KNIGHT) <= 1))
                 && (countChessPieces(PlayerColor.BLACK, ChessPieceType.QUEEN) == 0 ||
                 (countChessPieces(PlayerColor.BLACK, ChessPieceType.ROOK) == 0 && countChessPieces(PlayerColor.BLACK, ChessPieceType.BISHOP, ChessPieceType.KNIGHT) <= 1));
+        this.lastMove = lastMove;
     }
 
     public ArrayList<int[]> getPossibleMoves(int x, int y) {
@@ -131,17 +133,20 @@ public final class Chessboard {
     }
 
     Chessboard move(int[] from, int[] to) {
+        Move move;
         ChessPiece[][] chessPieces = copy(this.chessPieces);
+        move = new Move(from[0], from[1], to[0], to[1], this.chessPieces[from[0]][from[1]], to[0], to[1], chessPieces[to[0]][to[1]]);
         chessPieces[to[0]][to[1]] = this.chessPieces[from[0]][from[1]].moved(turn, Math.abs(from[1] - to[1]) > 1);
         chessPieces[from[0]][from[1]] = null;
         if (to.length == 4) {
+            move = new Move(from[0], from[1], to[0], to[1], this.chessPieces[from[0]][from[1]], to[2], to[3], chessPieces[to[2]][to[3]]);
             chessPieces[to[2]][to[3]] = null;
         } else if (to.length == 6) {
             chessPieces[to[4]][to[5]] = this.chessPieces[to[2]][to[3]].moved(turn, false);
             chessPieces[to[2]][to[3]] = null;
         }
         boolean promotion = chessPieces[to[0]][to[1]].checkPromotion(to[1]);
-        return new Chessboard(chessPieces, promotion ? turn : turn + 1, promotion ? playerColor : playerColor.otherColor(), promotion, promotion ? to[0] : -1, promotion ? to[1] : -1);
+        return new Chessboard(chessPieces, promotion ? turn : turn + 1, promotion ? playerColor : playerColor.otherColor(), promotion, promotion ? to[0] : -1, promotion ? to[1] : -1, move);
     }
 
 
@@ -180,7 +185,7 @@ public final class Chessboard {
     public Chessboard promotion(ChessPieceType chessPieceType) {
         ChessPiece[][] chessPieces = copy(this.chessPieces);
         chessPieces[promotionX][promotionY] = chessPieces[promotionX][promotionY].promotion(chessPieceType);
-        return new Chessboard(chessPieces, turn + 1, playerColor.otherColor(), false, -1, -1);
+        return new Chessboard(chessPieces, turn + 1, playerColor.otherColor(), false, -1, -1, lastMove);
     }
 
     public ChessPiece getChessPiece(int x, int y) {
@@ -206,7 +211,7 @@ public final class Chessboard {
         } else {
             chessPieces[x][y] = new ChessPiece(ChessPieceType.PAWN, PlayerColor.BLACK);
         }
-        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY);
+        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY, lastMove);
     }
 
     public Chessboard cycleChessPieceType(int x, int y) {
@@ -219,7 +224,7 @@ public final class Chessboard {
         } else {
             chessPieces[x][y] = new ChessPiece(ChessPieceType.PAWN, PlayerColor.WHITE);
         }
-        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY);
+        return new Chessboard(chessPieces, turn, playerColor, promotion, promotionX, promotionY, lastMove);
     }
 
     private boolean canMove() {

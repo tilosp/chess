@@ -52,4 +52,8 @@ public final class ChessPiece {
     public String toString() {
         return chessPieceType.toString() + playerColor.toString();
     }
+
+    public char toChar() {
+        return playerColor == PlayerColor.WHITE ? chessPieceType.symbolWhite : chessPieceType.symbolBlack;
+    }
 }
