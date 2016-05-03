@@ -1,14 +1,20 @@
 package de.tilosp.chess.gui;
 
+import de.tilosp.chess.lib.PlayerColor;
 import de.tilosp.chess.localisation.Localisation;
 import de.tilosp.chess.player.ComputerPlayer;
 import de.tilosp.chess.player.LocalPlayer;
+import de.tilosp.chess.player.NetworkPlayer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public final class NewGameGUI extends GUI {
 
@@ -136,9 +142,37 @@ public final class NewGameGUI extends GUI {
                 // 2 Players local
                 new ChessboardGUI(new LocalPlayer(), new LocalPlayer()).setVisible(true);
             } else if(twoPlayerModeComboBox.getSelectedIndex() == 1) {
-                // TODO 2 Players host
+                for (int port = 49152; port <= 65535; port++) {
+                    try {
+                        ServerSocket socket = new ServerSocket(port);
+                        new WaitGUI(socket, PlayerColor.values()[colorComboBox.getSelectedIndex()]).setVisible(true);
+                        break;
+                    } catch (IOException ignored) {}
+                }
             } else {
-                // TODO 2 Players client
+                try {
+                    int port = Integer.parseInt(portTextField.getText());
+                    if (port >= 49152 && port <= 65535) {
+                        new Thread(() -> {
+                            try {
+                                Socket socket = new Socket(hostTextField.getText(), port);
+                                InputStream in = socket.getInputStream();
+                                while (true) {
+                                    if (in.available() > 0)
+                                        break;
+                                    try {
+                                        Thread.sleep(100);
+                                    } catch (InterruptedException ignored) {}
+                                }
+                                PlayerColor playerColor = PlayerColor.values()[in.read()];
+                                if (playerColor == PlayerColor.WHITE)
+                                    new ChessboardGUI(new LocalPlayer(), new NetworkPlayer(socket)).setVisible(true);
+                                else
+                                    new ChessboardGUI(new NetworkPlayer(socket), new LocalPlayer()).setVisible(true);
+                            } catch (IOException ignored) {}
+                        }).start();
+                    }
+                } catch (NumberFormatException ignored) {}
             }
         }
         dispose();

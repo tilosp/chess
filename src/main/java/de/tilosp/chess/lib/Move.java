@@ -1,5 +1,9 @@
 package de.tilosp.chess.lib;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public final class Move {
 
     private final int fromX;
@@ -35,5 +39,22 @@ public final class Move {
 
     private static String getChar(int i) {
         return Character.toString((char) (0x61 + i));
+    }
+
+    public void write(DataOutputStream stream) throws IOException {
+        stream.writeInt(fromX);
+        stream.writeInt(fromY);
+        stream.writeInt(toX);
+        stream.writeInt(toY);
+        chessPiece.write(stream);
+        stream.writeInt(captureX);
+        stream.writeInt(captureY);
+        stream.writeBoolean(captureChessPiece != null);
+        if (captureChessPiece != null)
+            captureChessPiece.write(stream);
+    }
+
+    public static Move read(DataInputStream stream) throws IOException {
+        return new Move(stream.readInt(), stream.readInt(), stream.readInt(), stream.readInt(), ChessPiece.read(stream), stream.readInt(), stream.readInt(), stream.readBoolean() ? ChessPiece.read(stream) : null);
     }
 }

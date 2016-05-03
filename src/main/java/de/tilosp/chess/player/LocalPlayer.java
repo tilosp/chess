@@ -6,4 +6,7 @@ public final class LocalPlayer extends Player {
 
     @Override
     public void sendUpdate(Chessboard chessboard) {}
+
+    @Override
+    public void onClosed() {}
 }

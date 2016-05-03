@@ -403,6 +403,8 @@ public final class ChessboardGUI extends GUI implements WindowListener {
     @Override
     public void windowClosed(WindowEvent e) {
         timerThread.running = false;
+        for (Player p : players)
+            p.onClosed();
     }
 
     @Override

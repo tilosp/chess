@@ -1,5 +1,8 @@
 package de.tilosp.chess.lib;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -241,5 +244,32 @@ public final class Chessboard {
 
     public boolean isWin(PlayerColor color) {
         return color != playerColor && !canMove() && inCheck(playerColor);
+    }
+
+    public void write(DataOutputStream stream) throws IOException {
+        for (int i1 = 0; i1 < 8; i1++) {
+            for (int i2 = 0; i2 < 8; i2++) {
+                stream.writeBoolean(chessPieces[i1][i2] != null);
+                if (chessPieces[i1][i2] != null)
+                    chessPieces[i1][i2].write(stream);
+            }
+        }
+        stream.writeInt(turn);
+        stream.writeByte(playerColor.ordinal());
+        stream.writeBoolean(promotion);
+        stream.writeInt(promotionX);
+        stream.writeInt(promotionY);
+        stream.writeBoolean(lastMove != null);
+        if (lastMove != null)
+            lastMove.write(stream);
+    }
+
+    public static Chessboard read(DataInputStream stream) throws IOException {
+        ChessPiece[][] chessPieces = new ChessPiece[8][8];
+        for (int i1 = 0; i1 < 8; i1++)
+            for (int i2 = 0; i2 < 8; i2++)
+                if (stream.readBoolean())
+                    chessPieces[i1][i2] = ChessPiece.read(stream);
+        return new Chessboard(chessPieces, stream.readInt(), PlayerColor.values()[stream.readByte()], stream.readBoolean(), stream.readInt(), stream.readInt(), stream.readBoolean() ? Move.read(stream) : null);
     }
 }

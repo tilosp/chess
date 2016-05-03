@@ -14,4 +14,9 @@ public final class ComputerPlayer extends Player {
             }).start();
         }
     }
+
+    @Override
+    public void onClosed() {
+
+    }
 }

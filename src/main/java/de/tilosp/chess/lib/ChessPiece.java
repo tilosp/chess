@@ -1,5 +1,9 @@
 package de.tilosp.chess.lib;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public final class ChessPiece {
 
     public final ChessPieceType chessPieceType;
@@ -53,7 +57,19 @@ public final class ChessPiece {
         return chessPieceType.toString() + playerColor.toString();
     }
 
-    public char toChar() {
+    char toChar() {
         return playerColor == PlayerColor.WHITE ? chessPieceType.symbolWhite : chessPieceType.symbolBlack;
+    }
+
+    public void write(DataOutputStream stream) throws IOException {
+        stream.writeByte(chessPieceType.ordinal());
+        stream.writeByte(playerColor.ordinal());
+        stream.writeInt(movements);
+        stream.writeInt(movedInTurn);
+        stream.writeBoolean(enPassant);
+    }
+
+    public static ChessPiece read(DataInputStream stream) throws IOException {
+        return new ChessPiece(ChessPieceType.values()[stream.readByte()], PlayerColor.values()[stream.readByte()], stream.readInt(), stream.readInt(), stream.readBoolean());
     }
 }

@@ -21,4 +21,6 @@ public abstract class Player {
     void update(Chessboard chessboard) {
         SwingUtilities.invokeLater(() -> gui.externalUpdate(chessboard));
     }
+
+    public abstract void onClosed();
 }
