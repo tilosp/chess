@@ -25,7 +25,7 @@ public final class Move {
     public String getText() {
         String text = getChar(fromX) + getInt(fromY) + " \u2192 " + getChar(toX) + getInt(toY);
         if (captureChessPiece != null)
-            text += "    \u2717 " + captureChessPiece.toChar() + getChar(captureX) + getInt(captureY);
+            text += "   \u2717 " + captureChessPiece.toChar() + getChar(captureX) + getInt(captureY);
         return text;
     }
 
