@@ -8,12 +8,12 @@ public final class ChessEngine {
 
     private static final Random random = new Random();
 
-    public static Chessboard compute(Chessboard chessboard) {
+    public static Chessboard compute(Chessboard chessboard, int depth, int depthEndGame) {
         long time = System.currentTimeMillis();
 
         List<CThread> threads = new ArrayList<>();
         for (List<Chessboard> partPossibleMoves : splitList(getPossibleMoves(chessboard), Runtime.getRuntime().availableProcessors())) {
-            CThread thread = new CThread(chessboard.endGame, partPossibleMoves);
+            CThread thread = new CThread(chessboard.endGame, partPossibleMoves, depth - 1, depthEndGame - 1);
             threads.add(thread);
             thread.start();
         }
@@ -135,12 +135,16 @@ public final class ChessEngine {
 
         private final boolean endGame;
         private final List<Chessboard> moves;
+        private final int depth;
+        private final int depthEndGame;
         private ArrayList<Chessboard> bestMoves = new ArrayList<>();
         private int bestValue = Integer.MIN_VALUE;
 
-        private CThread(boolean endGame, List<Chessboard> moves) {
+        private CThread(boolean endGame, List<Chessboard> moves, int depth, int depthEndGame) {
             this.endGame = endGame;
             this.moves = moves;
+            this.depth = depth;
+            this.depthEndGame = depthEndGame;
         }
 
         private Result getResult() {
@@ -153,7 +157,7 @@ public final class ChessEngine {
         @Override
         public void run() {
             for (Chessboard c : moves) {
-                int value = -negamax(c, endGame ? 3 : 2, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
+                int value = -negamax(c, endGame ? depthEndGame : depth, Integer.MIN_VALUE + 1, Integer.MAX_VALUE);
                 if (value > bestValue) {
                     bestValue = value;
                     bestMoves = new ArrayList<>();

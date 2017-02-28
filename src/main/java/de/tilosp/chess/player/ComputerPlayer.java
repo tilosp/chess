@@ -10,7 +10,7 @@ public final class ComputerPlayer extends Player {
     public void sendUpdate(Chessboard chessboard) {
         if (chessboard.playerColor == color && !chessboard.isDraw() && !chessboard.isWin(PlayerColor.WHITE) && !chessboard.isWin(PlayerColor.BLACK)) {
             new Thread(() -> {
-                update(ChessEngine.compute(chessboard));
+                update(ChessEngine.compute(chessboard, 2, 3));
             }).start();
         }
     }
