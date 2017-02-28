@@ -57,4 +57,26 @@ public final class Move {
     public static Move read(DataInputStream stream) throws IOException {
         return new Move(stream.readInt(), stream.readInt(), stream.readInt(), stream.readInt(), ChessPiece.read(stream), stream.readInt(), stream.readInt(), stream.readBoolean() ? ChessPiece.read(stream) : null);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj instanceof Move) {
+            Move move = (Move) obj;
+            if (captureChessPiece == null ^ move.captureChessPiece == null)
+                return false;
+
+            return  fromX == move.fromX &&
+                    fromY == move.fromY &&
+                    toX == move.toX &&
+                    toY == move.toY &&
+                    chessPiece.equals(move.chessPiece) &&
+                    captureX == move.captureX &&
+                    captureY == move.captureY &&
+                    (captureChessPiece == null || captureChessPiece.equals(move.captureChessPiece));
+        }
+        return false;
+    }
 }
