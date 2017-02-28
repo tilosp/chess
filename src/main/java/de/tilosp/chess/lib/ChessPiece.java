@@ -53,6 +53,22 @@ public final class ChessPiece {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj instanceof ChessPiece) {
+            ChessPiece piece = (ChessPiece) obj;
+            return  chessPieceType == piece.chessPieceType &&
+                    playerColor == piece.playerColor &&
+                    movements == piece.movements &&
+                    movedInTurn == piece.movedInTurn &&
+                    enPassant == piece.enPassant;
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return chessPieceType.toString() + playerColor.toString();
     }
