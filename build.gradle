@@ -2,6 +2,8 @@ group 'de.tilosp.chess'
 version '2.0'
 
 apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
 
 sourceCompatibility = '1.8'
 
