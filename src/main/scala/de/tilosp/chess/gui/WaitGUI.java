@@ -2,8 +2,8 @@ package de.tilosp.chess.gui;
 
 import de.tilosp.chess.lib.PlayerColor;
 import de.tilosp.chess.localisation.Localisation;
-import de.tilosp.chess.player.LocalPlayer;
-import de.tilosp.chess.player.NetworkPlayer;
+import de.tilosp.chess.LocalPlayer;
+import de.tilosp.chess.NetworkPlayer;
 
 import javax.swing.*;
 import java.awt.*;
