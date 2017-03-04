@@ -1,6 +1,6 @@
 package de.tilosp.chess
 
-import java.io.{DataInputStream, DataOutputStream}
+import java.io.{DataInputStream, DataOutputStream, IOException}
 import java.net.Socket
 import javax.swing.SwingUtilities
 
@@ -59,9 +59,10 @@ final class NetworkPlayer(val socket: Socket) extends Player {
         try {
           if (in.available > 0)
             update(Chessboard.read(in))
-        }
-        try {
           Thread.sleep(100)
+        } catch {
+          case e: IOException => e.printStackTrace()
+          case _: InterruptedException =>
         }
       }
     }
@@ -72,6 +73,8 @@ final class NetworkPlayer(val socket: Socket) extends Player {
       try {
         chessboard.write(out)
         out.flush()
+      } catch {
+        case e: IOException => e.printStackTrace()
       }
     }
   }
@@ -82,6 +85,8 @@ final class NetworkPlayer(val socket: Socket) extends Player {
       in.close()
       out.close()
       socket.close()
+    } catch {
+      case e: IOException => e.printStackTrace()
     }
   }
 }
